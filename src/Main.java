@@ -1,7 +1,7 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -15,9 +15,9 @@ public class Main {
         scanner.close();
 
         // Generate color shades
-        List<String> shades = generateColorShades(line);
+        List<Color> shades = generateColorShades("primary", line);
         String grayscale = convertToGrayscale(line);
-        List<String> grayscaleShades = generateColorShades(grayscale);
+        List<Color> grayscaleShades = generateColorShades("grayscale", grayscale);
 
         // Compare color shades to grayscale shades
         System.out.println("Generating color shades...");
@@ -60,26 +60,31 @@ public class Main {
     /**
      * Takes a given hex color, creates 4 lighter and 4 darker versions of the color.
      * The colors are saved in a list from light to dark, with the original color in the center.
+     * The name of each color is generated based on the input name, and each shade is appended with a numerical value.
      *
+     * @param name     The base name for each color shade.
      * @param hexColor Input hex color value.
-     * @return A list of 9 elements, the first 4 being lighter, the fifth the original color, and the last 4 darker versions.
+     * @return A list of 9 elements, the first 4 being lighter shades with the naming convention name-100 to name-400,
+     * the fifth the original color as name-500, and the last 4 darker versions as name-600 to name-900.
      */
-    public static List<String> generateColorShades(String hexColor) {
+    public static List<Color> generateColorShades(String name, String hexColor) {
         hexColor = removeHex(hexColor);
 
-        List<String> shades = new ArrayList<>();
+        List<Color> shades = new LinkedList<>();
 
         // Create lighter color versions
         for (int i = 4; i >= 1; i--) {
-            shades.add(adjustColor(hexColor, 0.2 * i, true));
+            String shade = adjustColor(hexColor, 0.2 * i, true);
+            shades.add(new Color(name + "-" + (100 * (4 - i + 1)), shade));
         }
 
         // Add original color
-        shades.add("#" + hexColor);
+        shades.add(new Color(name + "-500", "#" + hexColor));
 
         // Create darker color versions
         for (int i = 1; i <= 4; i++) {
-            shades.add(adjustColor(hexColor, 0.2 * i, false));
+            String shade = adjustColor(hexColor, 0.2 * i, false);
+            shades.add(new Color(name + "-" + (500 + 100 * i), shade));
         }
 
         return shades;
@@ -114,29 +119,27 @@ public class Main {
 
 
     /**
-     * Compares two lists of hex color strings, calculates the contrast ratio between each pair of corresponding colors
-     * according to W3C standards, and writes the results as comments in a given CSS file.
+     * Compares two lists of Color objects, calculates the contrast ratio between each pair of corresponding colors
+     * according to W3C standards, and writes the results to a CSV file.
      * The contrast ratios are determined based on the relative luminance of the colors.
      *
-     * @param list1       The first list of hex color strings, with or without the '#' symbol at the start.
-     * @param list2       The second list of hex color strings, with or without the '#' symbol at the start.
-     * @param csvFileName The name of the CSS file where the contrast ratios will be written as comments.
+     * @param list1       The first list of Color objects.
+     * @param list2       The second list of Color objects.
+     * @param csvFileName The name of the CSV file where the contrast ratios will be written.
      */
-    public static void compareColorListsToCSV(List<String> list1, List<String> list2, String csvFileName) {
+    public static void compareColorListsToCSV(List<Color> list1, List<Color> list2, String csvFileName) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFileName))) {
-            writer.write("Name, Hex Code, Grayscale Hex Code, Contrast Ratio\n");
-            for (int i = 0; i < list1.size(); i++) {
-                String color1 = list1.get(i);
-                for (String color2 : list2) {
-                    double contrast = calculateContrast(color1, color2);
-                    writer.write("Primary-" + (i + 1) * 100 + ", " + color1 + ", " + color2 + ", " + contrast + "\n");
+            writer.write("Name, Color, Name, Color, Ratio\n");
+            for (Color color1 : list1) {
+                for (Color color2 : list2) {
+                    double contrast = calculateContrast(color1.getHexCode(), color2.getHexCode());
+                    writer.write(color1.getName() + ", " + color1.getHexCode() + ", " + color2.getName() + ", " + color2.getHexCode() + ", " + contrast + "\n");
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
 
 
     /**
