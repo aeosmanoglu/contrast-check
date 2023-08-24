@@ -1,8 +1,7 @@
 package functions;
 
 import models.Color;
-
-import java.util.LinkedList;
+import models.ColorList;
 
 import static functions.Utils.removeHex;
 
@@ -17,10 +16,10 @@ public class GenerateShades {
      * @return A list of 9 elements, the first 4 being lighter shades with the naming convention name-100 to name-400,
      * the fifth the original color as name-500, and the last 4 darker versions as name-600 to name-900.
      */
-    public static LinkedList<Color> generate(String name, String hexColor) {
+    public static ColorList generate(String name, String hexColor) {
         hexColor = removeHex(hexColor);
 
-        LinkedList<Color> shades = new LinkedList<>();
+        ColorList shades = new ColorList();
 
         for (int i = -4; i <= 4; i++) {
             if (i == 0) continue; // Skip 0

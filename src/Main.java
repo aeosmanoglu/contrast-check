@@ -1,6 +1,5 @@
-import models.Color;
+import models.ColorList;
 
-import java.util.LinkedList;
 import java.util.Scanner;
 
 import static functions.Convert2Grayscale.convert;
@@ -18,9 +17,9 @@ public class Main {
         scanner.close();
 
         // Generate color shades
-        LinkedList<Color> shades = generate("primary", line);
+        ColorList shades = generate("primary", line);
         String grayscale = convert(line);
-        LinkedList<Color> grayscaleShades = generate("grayscale", grayscale);
+        ColorList grayscaleShades = generate("grayscale", grayscale);
 
         // Compare color shades to grayscale shades
         System.out.println("Generating color shades...");

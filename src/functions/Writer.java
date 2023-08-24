@@ -1,11 +1,11 @@
 package functions;
 
-import models.Color;
+import models.ColorList;
+import models.Node;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.LinkedList;
 
 import static functions.Utils.removeHex;
 
@@ -19,17 +19,23 @@ public class Writer {
      * @param list2       The second list of Color objects.
      * @param csvFileName The name of the CSV file where the contrast ratios will be written.
      */
-    public static void toCSV(LinkedList<Color> list1, LinkedList<Color> list2, String csvFileName) {
+    public static void toCSV(ColorList list1, ColorList list2, String csvFileName) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFileName))) {
             writer.write("Name, Color, Name, Color, Ratio\n");
-            for (Color color1 : list1) {
-                for (Color color2 : list2) {
-                    double contrast = calculateContrast(color1.getHexCode(), color2.getHexCode());
-                    writer.write(color1.getName() + ", " + color1.getHexCode() + ", " + color2.getName() + ", " + color2.getHexCode() + ", " + contrast + "\n");
+
+            Node node1 = list1.head;
+            while (node1 != null) {
+                Node node2 = list2.head;
+                while (node2 != null) {
+                    double contrast = calculateContrast(node1.data.getHexCode(), node2.data.getHexCode());
+                    writer.write(node1.data.toString() + ", " + node2.data.toString() + ", " + contrast + "\n");
+                    node2 = node2.next;
                 }
+                node1 = node1.next;
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error writing to file: " + csvFileName);
+            System.out.println(e.getMessage());
         }
     }
 
@@ -47,7 +53,7 @@ public class Writer {
     private static double calculateContrast(String color1, String color2) {
         double l1 = calculateLuminance(color1);
         double l2 = calculateLuminance(color2);
-        double contrast =  (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+        double contrast = (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
 
         return Math.round(contrast * 100.0) / 100.0;
     }
