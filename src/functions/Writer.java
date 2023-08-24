@@ -1,7 +1,13 @@
+package functions;
+
+import models.Color;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
+
+import static functions.Utils.removeHex;
 
 public class Writer {
     /**
@@ -41,8 +47,9 @@ public class Writer {
     private static double calculateContrast(String color1, String color2) {
         double l1 = calculateLuminance(color1);
         double l2 = calculateLuminance(color2);
+        double contrast =  (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
 
-        return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+        return Math.round(contrast * 100.0) / 100.0;
     }
 
 
@@ -55,7 +62,7 @@ public class Writer {
      * @return The relative luminance of the color, a value between 0 (black) and 1 (white).
      */
     private static double calculateLuminance(String color) {
-        color = Utils.removeHex(color);
+        color = removeHex(color);
 
         double red = Integer.parseInt(color.substring(0, 2), 16) / 255.0;
         double green = Integer.parseInt(color.substring(2, 4), 16) / 255.0;

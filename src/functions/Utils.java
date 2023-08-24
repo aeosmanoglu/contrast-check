@@ -1,3 +1,5 @@
+package functions;
+
 public class Utils {
     /**
      * Removes the hash symbol ('#') from the beginning of the given hex color string if it exists.

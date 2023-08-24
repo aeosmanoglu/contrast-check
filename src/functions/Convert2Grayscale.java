@@ -1,3 +1,7 @@
+package functions;
+
+import static functions.Utils.removeHex;
+
 public class Convert2Grayscale {
     public static String convert(String hexColor) {
         return convert(hexColor, .925);
@@ -11,7 +15,7 @@ public class Convert2Grayscale {
      * @return The grayed version of the hex color as a string, including the '#' symbol.
      */
     public static String convert(String hexColor, double factor) {
-        hexColor = Utils.removeHex(hexColor);
+        hexColor = removeHex(hexColor);
 
         int red = Integer.parseInt(hexColor.substring(0, 2), 16);
         int green = Integer.parseInt(hexColor.substring(2, 4), 16);

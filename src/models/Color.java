@@ -1,3 +1,5 @@
+package models;
+
 public class Color {
     private String name;
     private String hexCode;

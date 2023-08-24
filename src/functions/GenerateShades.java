@@ -1,4 +1,10 @@
+package functions;
+
+import models.Color;
+
 import java.util.LinkedList;
+
+import static functions.Utils.removeHex;
 
 public class GenerateShades {
     /**
@@ -12,24 +18,22 @@ public class GenerateShades {
      * the fifth the original color as name-500, and the last 4 darker versions as name-600 to name-900.
      */
     public static LinkedList<Color> generate(String name, String hexColor) {
-        hexColor = Utils.removeHex(hexColor);
+        hexColor = removeHex(hexColor);
 
         LinkedList<Color> shades = new LinkedList<>();
 
-        // Create lighter color versions
-        for (int i = 4; i >= 1; i--) {
-            String shade = adjustColor(hexColor, 0.2 * i, true);
-            shades.add(new Color(name + "-" + (100 * (4 - i + 1)), shade));
+        for (int i = -4; i <= 4; i++) {
+            if (i == 0) continue; // Skip 0
+            boolean isLighter = i < 0;
+            int absI = Math.abs(i);
+            String shade = adjustColor(hexColor, 0.2 * absI, isLighter);
+            int value = isLighter ? 100 * (4 - absI + 1) : 500 + 100 * absI;
+            shades.add(new Color(name + "-" + value, shade));
         }
 
         // Add original color
-        shades.add(new Color(name + "-500", "#" + hexColor));
+        shades.add(4, new Color(name + "-500", "#" + hexColor));
 
-        // Create darker color versions
-        for (int i = 1; i <= 4; i++) {
-            String shade = adjustColor(hexColor, 0.2 * i, false);
-            shades.add(new Color(name + "-" + (500 + 100 * i), shade));
-        }
 
         return shades;
     }
@@ -38,17 +42,17 @@ public class GenerateShades {
     /**
      * Adjusts a given hex color by the specified factor, either making it lighter or darker.
      *
-     * @param color   The hex color value without the '#' symbol.
-     * @param factor  The factor by which to adjust the color. Ranges from 0 to 1, with higher values making a more drastic change.
-     * @param lighter If true, makes the color lighter; if false, makes it darker.
+     * @param color     The hex color value without the '#' symbol.
+     * @param factor    The factor by which to adjust the color. Ranges from 0 to 1, with higher values making a more drastic change.
+     * @param isLighter If true, makes the color lighter; if false, makes it darker.
      * @return The adjusted hex color as a string, including the '#' symbol.
      */
-    private static String adjustColor(String color, double factor, boolean lighter) {
+    private static String adjustColor(String color, double factor, boolean isLighter) {
         int red = Integer.parseInt(color.substring(0, 2), 16);
         int green = Integer.parseInt(color.substring(2, 4), 16);
         int blue = Integer.parseInt(color.substring(4, 6), 16);
 
-        if (lighter) {
+        if (isLighter) {
             red = Math.min(red + (int) ((255 - red) * factor), 255);
             green = Math.min(green + (int) ((255 - green) * factor), 255);
             blue = Math.min(blue + (int) ((255 - blue) * factor), 255);

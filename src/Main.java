@@ -1,5 +1,12 @@
+import models.Color;
+
 import java.util.LinkedList;
 import java.util.Scanner;
+
+import static functions.Convert2Grayscale.convert;
+import static functions.GenerateShades.generate;
+import static functions.Utils.removeHex;
+import static functions.Writer.toCSV;
 
 public class Main {
     public static void main(String[] args) {
@@ -11,14 +18,14 @@ public class Main {
         scanner.close();
 
         // Generate color shades
-        LinkedList<Color> shades = GenerateShades.generate("primary", line);
-        String grayscale = Convert2Grayscale.convert(line);
-        LinkedList<Color> grayscaleShades = GenerateShades.generate("grayscale", grayscale);
+        LinkedList<Color> shades = generate("primary", line);
+        String grayscale = convert(line);
+        LinkedList<Color> grayscaleShades = generate("grayscale", grayscale);
 
         // Compare color shades to grayscale shades
         System.out.println("Generating color shades...");
-        String csvFileName = Utils.removeHex(line) + "-contrast-ratios.csv";
-        Writer.toCSV(shades, grayscaleShades, csvFileName);
+        String csvFileName = removeHex(line) + "-contrast-ratios.csv";
+        toCSV(shades, grayscaleShades, csvFileName);
         System.out.println(csvFileName + " created!");
 
     }
